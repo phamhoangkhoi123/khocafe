@@ -1,0 +1,730 @@
+
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#111827">
+<title>KhoiStock - Quản lý kho</title>
+
+<style>
+:root {
+  --bg:#f3f5f9;
+  --card:#ffffff;
+  --text:#172033;
+  --muted:#8490a3;
+  --primary:#5267e8;
+  --border:#e9edf3;
+  --green:#16a36a;
+  --red:#e34f5f;
+}
+body.dark {
+  --bg:#101522;
+  --card:#1b2435;
+  --text:#f1f5f9;
+  --muted:#9ba8bb;
+  --border:#303b4e;
+  --primary:#8292ff;
+}
+* {box-sizing:border-box;margin:0;padding:0}
+body {
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  background:var(--bg);
+  color:var(--text);
+  padding-bottom:90px;
+  transition:.2s;
+}
+button,input,select {font:inherit}
+button {cursor:pointer}
+header {
+  background:var(--card);
+  padding:18px 18px 14px;
+  border-bottom:1px solid var(--border);
+  position:sticky;
+  top:0;
+  z-index:5;
+}
+.header-row {
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+.brand {
+  display:flex;
+  align-items:center;
+  gap:10px;
+}
+.logo {
+  background:var(--primary);
+  color:white;
+  width:42px;height:42px;
+  display:grid;place-items:center;
+  border-radius:13px;
+  font-weight:800;
+  font-size:19px;
+}
+.brand h2 {font-size:19px}
+.brand p {font-size:11px;color:var(--muted);margin-top:3px}
+.icon-btn {
+  width:40px;height:40px;
+  border:1px solid var(--border);
+  background:var(--bg);
+  color:var(--text);
+  border-radius:12px;
+  font-size:18px;
+}
+main {max-width:650px;margin:auto;padding:20px 16px}
+.welcome {margin-bottom:20px}
+.welcome h1 {font-size:23px;margin-bottom:5px}
+.welcome p {color:var(--muted);font-size:13px}
+.section-title {
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin:22px 0 12px;
+}
+.section-title h3 {font-size:16px}
+.section-title span {font-size:12px;color:var(--muted)}
+.stats {
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:12px;
+}
+.card {
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:17px;
+  padding:16px;
+}
+.stat-icon {font-size:22px;margin-bottom:13px}
+.stat-label {font-size:12px;color:var(--muted)}
+.stat-value {font-size:25px;font-weight:750;margin-top:5px}
+.stat-note {font-size:11px;color:var(--muted);margin-top:5px}
+.actions {
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:12px;
+}
+.action-btn {
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:15px;
+  padding:15px;
+  color:var(--text);
+  text-align:left;
+}
+.action-btn b {display:block;margin-top:9px;font-size:14px}
+.action-btn small {color:var(--muted);font-size:11px}
+.action-btn .emoji {font-size:23px}
+.primary-btn {
+  background:var(--primary);
+  color:white;
+  border:0;
+  padding:11px 15px;
+  border-radius:11px;
+  font-weight:600;
+}
+.search {
+  width:100%;
+  background:var(--card);
+  color:var(--text);
+  border:1px solid var(--border);
+  border-radius:12px;
+  padding:13px;
+  outline:none;
+  margin-bottom:12px;
+}
+.item {
+  display:flex;
+  align-items:center;
+  gap:12px;
+  padding:14px 0;
+  border-bottom:1px solid var(--border);
+}
+.item:last-child {border:0}
+.item-icon {
+  width:43px;height:43px;
+  display:grid;place-items:center;
+  background:var(--bg);
+  border-radius:13px;
+  font-size:21px;
+}
+.item-info {flex:1;min-width:0}
+.item-info b {font-size:14px}
+.item-info small {
+  display:block;
+  color:var(--muted);
+  margin-top:5px;
+  font-size:11px;
+}
+.quantity {text-align:right;font-weight:750}
+.quantity small {
+  display:block;
+  color:var(--muted);
+  font-weight:400;
+  margin-top:4px;
+}
+.warning {
+  color:#d78a16;
+  font-size:11px;
+  margin-top:4px;
+}
+.transaction {
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:13px 0;
+  border-bottom:1px solid var(--border);
+  font-size:13px;
+}
+.transaction small {
+  display:block;
+  color:var(--muted);
+  margin-top:5px;
+  font-size:11px;
+}
+.in {color:var(--green);font-weight:700}
+.out {color:var(--red);font-weight:700}
+nav {
+  position:fixed;
+  bottom:0;left:0;right:0;
+  z-index:10;
+  background:var(--card);
+  border-top:1px solid var(--border);
+  display:flex;
+  justify-content:space-around;
+  padding:9px 4px calc(9px + env(safe-area-inset-bottom));
+}
+nav button {
+  border:0;
+  background:none;
+  color:var(--muted);
+  font-size:10px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:4px;
+  min-width:58px;
+}
+nav button strong {font-size:21px;font-weight:400}
+nav button.active {color:var(--primary);font-weight:700}
+.page {display:none}
+.page.active {display:block}
+.empty {text-align:center;color:var(--muted);padding:25px;font-size:13px}
+.modal-bg {
+  display:none;
+  position:fixed;inset:0;
+  background:#0008;
+  z-index:20;
+  align-items:flex-end;
+  justify-content:center;
+}
+.modal-bg.show {display:flex}
+.modal {
+  background:var(--card);
+  width:100%;
+  max-width:550px;
+  border-radius:22px 22px 0 0;
+  padding:22px 18px calc(25px + env(safe-area-inset-bottom));
+  max-height:90vh;
+  overflow:auto;
+}
+.modal h3 {margin-bottom:18px}
+.field {margin-bottom:14px}
+.field label {
+  display:block;
+  font-size:12px;
+  color:var(--muted);
+  margin-bottom:7px;
+}
+.field input,.field select {
+  width:100%;
+  padding:13px;
+  border:1px solid var(--border);
+  border-radius:11px;
+  background:var(--bg);
+  color:var(--text);
+  outline:none;
+}
+.modal-actions {display:flex;gap:10px;margin-top:20px}
+.modal-actions button {flex:1}
+.secondary-btn {
+  border:1px solid var(--border);
+  background:var(--bg);
+  color:var(--text);
+  border-radius:11px;
+  padding:12px;
+}
+.notice {
+  background:var(--bg);
+  padding:12px;
+  border-radius:12px;
+  color:var(--muted);
+  font-size:12px;
+  line-height:1.5;
+  margin-bottom:14px;
+}
+@media(min-width:600px) {
+  .modal-bg {align-items:center}
+  .modal {border-radius:20px}
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <div class="header-row">
+    <div class="brand">
+      <div class="logo">K</div>
+      <div>
+        <h2>KhoiStock</h2>
+        <p>QUẢN LÝ NGUYÊN LIỆU</p>
+      </div>
+    </div>
+    <button class="icon-btn" onclick="toggleTheme()">☾</button>
+  </div>
+</header>
+
+<main>
+
+<!-- DASHBOARD -->
+<section id="home" class="page active">
+  <div class="welcome">
+    <h1>Xin chào, Quản lý 👋</h1>
+    <p>Tổng quan tình hình kho nguyên liệu của bạn.</p>
+  </div>
+
+  <div class="stats">
+    <div class="card">
+      <div class="stat-icon">📦</div>
+      <div class="stat-label">Loại nguyên liệu</div>
+      <div class="stat-value" id="totalTypes">0</div>
+      <div class="stat-note">Đang quản lý</div>
+    </div>
+    <div class="card">
+      <div class="stat-icon">📊</div>
+      <div class="stat-label">Tổng số lượng</div>
+      <div class="stat-value" id="totalQty">0</div>
+      <div class="stat-note">Tổng các đơn vị tồn</div>
+    </div>
+    <div class="card">
+      <div class="stat-icon">📥</div>
+      <div class="stat-label">Nhập hôm nay</div>
+      <div class="stat-value" id="todayIn">0</div>
+      <div class="stat-note">Tổng số lượng nhập</div>
+    </div>
+    <div class="card">
+      <div class="stat-icon">📤</div>
+      <div class="stat-label">Xuất hôm nay</div>
+      <div class="stat-value" id="todayOut">0</div>
+      <div class="stat-note">Tổng số lượng xuất</div>
+    </div>
+  </div>
+
+  <div class="section-title"><h3>Thao tác nhanh</h3></div>
+  <div class="actions">
+    <button class="action-btn" onclick="openModal('in')">
+      <span class="emoji">📥</span>
+      <b>Nhập kho</b>
+      <small>Thêm nguyên liệu</small>
+    </button>
+    <button class="action-btn" onclick="openModal('out')">
+      <span class="emoji">📤</span>
+      <b>Xuất kho</b>
+      <small>Lấy nguyên liệu</small>
+    </button>
+  </div>
+
+  <div class="section-title">
+    <h3>⚠️ Nguyên liệu sắp hết</h3>
+    <span id="warningCount">0 mục</span>
+  </div>
+  <div class="card" id="warningList"></div>
+
+  <div class="section-title"><h3>Giao dịch gần đây</h3></div>
+  <div class="card" id="recentList"></div>
+</section>
+
+<!-- INVENTORY -->
+<section id="inventory" class="page">
+  <div class="welcome">
+    <h1>Nguyên liệu</h1>
+    <p>Quản lý số lượng tồn kho.</p>
+  </div>
+  <input class="search" id="searchInput"
+    placeholder="🔍 Tìm nguyên liệu..."
+    oninput="renderInventory()">
+  <button class="primary-btn" onclick="openModal('add')">
+    + Thêm nguyên liệu
+  </button>
+  <div class="section-title">
+    <h3>Danh sách kho</h3>
+    <span id="inventoryCount">0 mục</span>
+  </div>
+  <div class="card" id="inventoryList"></div>
+</section>
+
+<!-- HISTORY -->
+<section id="history" class="page">
+  <div class="welcome">
+    <h1>Lịch sử giao dịch</h1>
+    <p>Theo dõi hoạt động nhập và xuất kho.</p>
+  </div>
+  <div class="card" id="historyList"></div>
+</section>
+
+<!-- STATISTICS -->
+<section id="statistics" class="page">
+  <div class="welcome">
+    <h1>Thống kê</h1>
+    <p>Báo cáo hoạt động nhập xuất trong tháng.</p>
+  </div>
+  <div class="stats">
+    <div class="card">
+      <div class="stat-label">Tổng nhập tháng này</div>
+      <div class="stat-value in" id="monthIn">0</div>
+    </div>
+    <div class="card">
+      <div class="stat-label">Tổng xuất tháng này</div>
+      <div class="stat-value out" id="monthOut">0</div>
+    </div>
+  </div>
+  <div class="section-title"><h3>Chi tiết giao dịch tháng</h3></div>
+  <div class="card" id="monthList"></div>
+</section>
+
+</main>
+
+<nav>
+  <button class="active" onclick="showPage('home',this)">
+    <strong>⌂</strong>Trang chủ
+  </button>
+  <button onclick="showPage('inventory',this)">
+    <strong>▤</strong>Kho hàng
+  </button>
+  <button onclick="showPage('history',this)">
+    <strong>◷</strong>Lịch sử
+  </button>
+  <button onclick="showPage('statistics',this)">
+    <strong>▥</strong>Thống kê
+  </button>
+</nav>
+
+<!-- MODAL -->
+<div class="modal-bg" id="modalBg" onclick="if(event.target===this)closeModal()">
+  <div class="modal">
+    <h3 id="modalTitle">Thao tác kho</h3>
+    <div class="notice" id="modalNotice">
+      Nhập thông tin giao dịch.
+    </div>
+
+    <form id="stockForm" onsubmit="saveTransaction(event)">
+      <input type="hidden" id="actionType">
+
+      <div class="field" id="nameField">
+        <label>Tên nguyên liệu</label>
+        <input id="materialName" placeholder="Ví dụ: Cà phê">
+      </div>
+
+      <div class="field" id="iconField">
+        <label>Biểu tượng</label>
+        <input id="materialIcon" placeholder="☕" value="📦">
+      </div>
+
+      <div class="field" id="unitField">
+        <label>Đơn vị tính</label>
+        <input id="materialUnit" placeholder="Gói, hộp, kg...">
+      </div>
+
+      <div class="field" id="thresholdField">
+        <label>Mức cảnh báo tồn kho</label>
+        <input id="materialThreshold" type="number" min="0" value="5">
+      </div>
+
+      <div class="field" id="selectField">
+        <label>Chọn nguyên liệu</label>
+        <select id="materialSelect"></select>
+      </div>
+
+      <div class="field">
+        <label id="qtyLabel">Số lượng</label>
+        <input id="quantity" type="number" min="1"
+          step="any" placeholder="Nhập số lượng" required>
+      </div>
+
+      <div class="field" id="personField">
+        <label>Người thực hiện</label>
+        <input id="person" placeholder="Tên nhân viên" value="Quản lý">
+      </div>
+
+      <div class="modal-actions">
+        <button type="button" class="secondary-btn" onclick="closeModal()">Hủy</button>
+        <button type="submit" class="primary-btn">Xác nhận</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+// DỮ LIỆU THỬ NGHIỆM
+const KEY = "khoistock_v1";
+
+let data = JSON.parse(localStorage.getItem(KEY) || "null");
+
+if (!data) {
+  data = {
+    items: [
+      {id:1,name:"Cà phê",icon:"☕",unit:"gói",qty:100,threshold:10},
+      {id:2,name:"Sữa tươi",icon:"🥛",unit:"hộp",qty:30,threshold:5},
+      {id:3,name:"Đường",icon:"🍬",unit:"kg",qty:25,threshold:5},
+      {id:4,name:"Trà đen",icon:"🍵",unit:"gói",qty:8,threshold:10}
+    ],
+    history:[]
+  };
+}
+
+function saveData() {
+  localStorage.setItem(KEY,JSON.stringify(data));
+}
+
+function showPage(id,btn) {
+  document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));
+  document.getElementById(id).classList.add("active");
+  document.querySelectorAll("nav button").forEach(b=>b.classList.remove("active"));
+  btn.classList.add("active");
+  renderAll();
+}
+
+function toggleTheme() {
+  document.body.classList.toggle("dark");
+  localStorage.setItem("khoistock_theme",
+    document.body.classList.contains("dark")?"dark":"light");
+}
+
+if(localStorage.getItem("khoistock_theme")==="dark") {
+  document.body.classList.add("dark");
+}
+
+function formatDate(date) {
+  return new Date(date).toLocaleString("vi-VN");
+}
+
+function todayKey(date) {
+  const d=new Date(date);
+  return d.getFullYear()+"-"+(d.getMonth()+1)+"-"+d.getDate();
+}
+
+function isToday(date) {
+  return todayKey(date)===todayKey(Date.now());
+}
+
+function isThisMonth(date) {
+  const d=new Date(date),now=new Date();
+  return d.getMonth()===now.getMonth() &&
+         d.getFullYear()===now.getFullYear();
+}
+
+function renderDashboard() {
+  document.getElementById("totalTypes").textContent=data.items.length;
+  document.getElementById("totalQty").textContent=
+    data.items.reduce((s,i)=>s+i.qty,0);
+
+  document.getElementById("todayIn").textContent=
+    data.history.filter(h=>h.type==="in"&&isToday(h.date))
+    .reduce((s,h)=>s+h.qty,0);
+
+  document.getElementById("todayOut").textContent=
+    data.history.filter(h=>h.type==="out"&&isToday(h.date))
+    .reduce((s,h)=>s+h.qty,0);
+
+  const warnings=data.items.filter(i=>i.qty<=i.threshold);
+  document.getElementById("warningCount").textContent=warnings.length+" mục";
+
+  document.getElementById("warningList").innerHTML=warnings.length
+    ?warnings.map(i=>`
+      <div class="item">
+        <div class="item-icon">${i.icon}</div>
+        <div class="item-info"><b>${escapeHTML(i.name)}</b>
+          <small>Ngưỡng cảnh báo: ${i.threshold} ${escapeHTML(i.unit)}</small>
+        </div>
+        <div class="quantity warning">${i.qty} ${escapeHTML(i.unit)}
+          <small>Sắp hết hàng</small>
+        </div>
+      </div>`).join("")
+    :'<div class="empty">✓ Kho chưa có nguyên liệu nào sắp hết</div>';
+
+  const recent=data.history.slice(0,5);
+  document.getElementById("recentList").innerHTML=recent.length
+    ?recent.map(transactionHTML).join("")
+    :'<div class="empty">Chưa có giao dịch nào</div>';
+}
+
+function renderInventory() {
+  const q=(document.getElementById("searchInput")?.value||"").toLowerCase();
+  const list=data.items.filter(i=>i.name.toLowerCase().includes(q));
+  document.getElementById("inventoryCount").textContent=list.length+" mục";
+
+  document.getElementById("inventoryList").innerHTML=list.length
+    ?list.map(i=>`
+      <div class="item">
+        <div class="item-icon">${i.icon}</div>
+        <div class="item-info">
+          <b>${escapeHTML(i.name)}</b>
+          <small>Ngưỡng cảnh báo: ${i.threshold} ${escapeHTML(i.unit)}</small>
+          ${i.qty<=i.threshold?'<div class="warning">⚠ Sắp hết hàng</div>':''}
+        </div>
+        <div class="quantity">${i.qty}
+          <small>${escapeHTML(i.unit)}</small>
+        </div>
+      </div>`).join("")
+    :'<div class="empty">Không tìm thấy nguyên liệu</div>';
+}
+
+function transactionHTML(h) {
+  const item=data.items.find(i=>i.id===h.itemId);
+  return `
+    <div class="transaction">
+      <div>
+        <b>${h.type==="in"?"📥 Nhập kho":"📤 Xuất kho"} · ${escapeHTML(h.name)}</b>
+        <small>${escapeHTML(h.person)} · ${formatDate(h.date)}</small>
+      </div>
+      <div class="${h.type==="in"?"in":"out"}">
+        ${h.type==="in"?"+":"-"}${h.qty}
+        <small style="text-align:right">${escapeHTML(h.unit)}</small>
+      </div>
+    </div>`;
+}
+
+function renderHistory() {
+  document.getElementById("historyList").innerHTML=data.history.length
+    ?data.history.map(transactionHTML).join("")
+    :'<div class="empty">Chưa có lịch sử giao dịch</div>';
+}
+
+function renderStatistics() {
+  const list=data.history.filter(h=>isThisMonth(h.date));
+  document.getElementById("monthIn").textContent=
+    list.filter(h=>h.type==="in").reduce((s,h)=>s+h.qty,0);
+  document.getElementById("monthOut").textContent=
+    list.filter(h=>h.type==="out").reduce((s,h)=>s+h.qty,0);
+  document.getElementById("monthList").innerHTML=list.length
+    ?list.map(transactionHTML).join("")
+    :'<div class="empty">Tháng này chưa có giao dịch</div>';
+}
+
+function renderAll() {
+  renderDashboard();
+  renderInventory();
+  renderHistory();
+  renderStatistics();
+}
+
+function escapeHTML(value) {
+  return String(value).replace(/[&<>"']/g,c=>({
+    "&":"&amp;","<":"&lt;",">":"&gt;",
+    '"':"&quot;","'":"&#39;"
+  }[c]));
+}
+
+function openModal(type) {
+  document.getElementById("stockForm").reset();
+  document.getElementById("actionType").value=type;
+  document.getElementById("person").value="Quản lý";
+  document.getElementById("materialIcon").value="📦";
+  document.getElementById("materialThreshold").value=5;
+
+  const isAdd=type==="add";
+  const isIn=type==="in";
+  const isOut=type==="out";
+
+  document.getElementById("modalTitle").textContent=
+    isAdd?"Thêm nguyên liệu":isIn?"Nhập kho":"Xuất kho";
+
+  document.getElementById("modalNotice").textContent=
+    isAdd?"Tạo một loại nguyên liệu mới trong kho.":
+    isIn?"Nhập thêm số lượng vào kho.":"Xuất số lượng nguyên liệu khỏi kho.";
+
+  ["nameField","iconField","unitField","thresholdField"]
+    .forEach(id=>document.getElementById(id).style.display=isAdd?"block":"none");
+
+  document.getElementById("selectField").style.display=isAdd?"none":"block";
+  document.getElementById("qtyLabel").textContent="Số lượng";
+  document.getElementById("quantity").value="";
+  document.getElementById("quantity").max="";
+
+  const select=document.getElementById("materialSelect");
+  select.innerHTML=data.items.map(i=>
+    `<option value="${i.id}">${escapeHTML(i.name)} (${i.qty} ${escapeHTML(i.unit)})</option>`
+  ).join("");
+
+  document.getElementById("modalBg").classList.add("show");
+}
+
+function closeModal() {
+  document.getElementById("modalBg").classList.remove("show");
+}
+
+function saveTransaction(e) {
+  e.preventDefault();
+
+  const type=document.getElementById("actionType").value;
+  const qty=Number(document.getElementById("quantity").value);
+  const person=document.getElementById("person").value.trim()||"Chưa rõ";
+
+  if(!Number.isFinite(qty)||qty<=0) {
+    alert("Vui lòng nhập số lượng hợp lệ!");
+    return;
+  }
+
+  if(type==="add") {
+    const name=document.getElementById("materialName").value.trim();
+    const icon=document.getElementById("materialIcon").value.trim()||"📦";
+    const unit=document.getElementById("materialUnit").value.trim();
+    const threshold=Number(document.getElementById("materialThreshold").value);
+
+    if(!name||!unit||!Number.isFinite(threshold)||threshold<0) {
+      alert("Vui lòng nhập đầy đủ thông tin!");
+      return;
+    }
+    if(data.items.some(i=>i.name.toLowerCase()===name.toLowerCase())) {
+      alert("Nguyên liệu này đã tồn tại!");
+      return;
+    }
+
+    const item={id:Date.now(),name,icon,unit,qty,threshold};
+    data.items.push(item);
+    data.history.unshift({
+      type:"in",itemId:item.id,name,unit,qty,
+      person,date:Date.now()
+    });
+
+  } else {
+    const id=Number(document.getElementById("materialSelect").value);
+    const item=data.items.find(i=>i.id===id);
+    if(!item) {alert("Không tìm thấy nguyên liệu!");return;}
+
+    if(type==="out"&&qty>item.qty) {
+      alert("Không đủ hàng trong kho! Hiện chỉ còn "+item.qty+" "+item.unit);
+      return;
+    }
+
+    item.qty += type==="in"?qty:-qty;
+
+    data.history.unshift({
+      type,itemId:item.id,name:item.name,unit:item.unit,
+      qty,person,date:Date.now()
+    });
+  }
+
+  saveData();
+  closeModal();
+  renderAll();
+  alert("Đã cập nhật kho thành công!");
+}
+
+renderAll();
+</script>
+
+</body>
+</html>
