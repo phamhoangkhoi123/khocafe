@@ -129,7 +129,6 @@ let formType="add", selectedId=null, unsubs=[], sessionId=null, sessionStarted=f
 const $=id=>document.getElementById(id);
 const roleName={admin:"ADMIN",quanly:"QUẢN LÝ",nhanvien:"NHÂN VIÊN"};
 const canManage=()=>profile && ["admin","quanly"].includes(profile.role);
-const canStockOut=()=>profile && ["admin","quanly","nhanvien"].includes(profile.role);
 const isAdmin=()=>profile?.role==="admin";
 
 function escapeHTML(value){return String(value??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
@@ -216,7 +215,7 @@ window.showSection=function(id,btn){
 window.toggleDark=()=>document.body.classList.toggle("dark");
 
 window.openAdd=function(){
- if(!canManage())return showError("Nhân viên chỉ được xuất kho, không được thêm nguyên liệu.");
+ if(!canManage())return showError("Tài khoản nhân viên chỉ được xem và xuất kho.");
  formType="add";selectedId=null;$("modalTitle").textContent="Thêm nguyên liệu";
  $("formArea").innerHTML=`<label>Tên nguyên liệu</label><input id="fName" placeholder="Ví dụ: Cà phê"><label>Đơn vị</label><input id="fUnit" placeholder="Ví dụ: gói, hộp, kg"><label>Số lượng ban đầu</label><input id="fQty" type="number" min="0" value="0"><label>Ngưỡng cảnh báo</label><input id="fLimit" type="number" min="0" value="5">`;
  $("modal").classList.add("show");
@@ -229,8 +228,7 @@ window.openEdit=function(id){
  $("modal").classList.add("show");
 };
 window.openMove=function(id,type){
- if(type==="in"&&!canManage())return showError("Nhân viên không có quyền nhập kho.");
- if(type==="out"&&!canStockOut())return showError("Tài khoản không có quyền xuất kho.");
+ if(!canManage())return;
  const item=items.find(x=>x.id===id);if(!item)return;
  formType=type;selectedId=id;$("modalTitle").textContent=type==="in"?"Nhập kho":"Xuất kho";
  $("formArea").innerHTML=`<p><b>${escapeHTML(item.name)}</b> — Hiện có: ${Number(item.qty)||0} ${escapeHTML(item.unit)}</p><label>Số lượng</label><input id="fQty" type="number" min="1" step="1" placeholder="Nhập số lượng"><label>Ghi chú (không bắt buộc)</label><input id="fNote" placeholder="Ví dụ: Nhập hàng buổi sáng">`;
@@ -239,7 +237,7 @@ window.openMove=function(id,type){
 window.closeModal=()=>$("modal").classList.remove("show");
 
 window.saveForm=async function(){
- if(!canManage()&&formType!=="out")return showError("Nhân viên chỉ được xuất kho.");
+ if(!canManage())return;
  const btn=$("saveBtn");btn.disabled=true;btn.textContent="Đang lưu...";
  try{
   if(formType==="add"||formType==="edit"){
@@ -297,14 +295,18 @@ function dateText(ts){
  const d=ts.toDate?ts.toDate():new Date(ts);
  return d.toLocaleString("vi-VN");
 }
+function normalizeSearch(value){
+ return String(value||"").toLocaleLowerCase("vi")
+  .normalize("NFD").replace(/[\\u0300-\\u036f]/g,"").replace(/đ/g,"d").trim();
+}
 function render(){
- const q=($("search")?.value||"").toLowerCase();
- const filtered=items.filter(x=>(x.name||"").toLowerCase().includes(q));
+ const q=normalizeSearch($("search")?.value||"");
+ const filtered=items.filter(x=>normalizeSearch(x.name||"").includes(q));
  $("count").textContent=items.length+" mục";
  $("inventory").innerHTML=filtered.length?filtered.map(x=>`
  <div class="item"><div class="emoji">📦</div><div class="info"><strong>${escapeHTML(x.name)}</strong><small>Ngưỡng cảnh báo: ${Number(x.limit)||0} ${escapeHTML(x.unit)}</small>
  ${Number(x.qty)<=Number(x.limit)?'<div class="alert">⚠ Sắp hết hàng</div>':''}
- <div class="item-actions">${canManage()?`<button class="secondary" onclick="openMove('${x.id}','in')">＋ Nhập</button>`:""}${canStockOut()?`<button class="secondary" onclick="openMove('${x.id}','out')">－ Xuất</button>`:""}${canManage()?`<button class="secondary" onclick="openEdit('${x.id}')">Sửa</button>`:""}${isAdmin()?`<button class="danger" onclick="deleteItem('${x.id}')">Xóa</button>`:""}</div></div><div class="amount">${Number(x.qty)||0}<small>${escapeHTML(x.unit)}</small></div></div>`).join(""):'<div class="empty"><div>📦</div>Kho đang trống hoặc không có kết quả phù hợp.</div>';
+ <div class="item-actions">${canManage()?`<button class="secondary" onclick="openMove('${x.id}','in')">＋ Nhập</button><button class="secondary" onclick="openMove('${x.id}','out')">－ Xuất</button><button class="secondary" onclick="openEdit('${x.id}')">Sửa</button>`:""}${isAdmin()?`<button class="danger" onclick="deleteItem('${x.id}')">Xóa</button>`:""}</div></div><div class="amount">${Number(x.qty)||0}<small>${escapeHTML(x.unit)}</small></div></div>`).join(""):'<div class="empty"><div>📦</div>Kho đang trống hoặc không có kết quả phù hợp.</div>';
  const low=items.filter(x=>Number(x.qty)<=Number(x.limit));
  $("lowList").innerHTML=low.length?low.map(x=>`<p>⚠ ${escapeHTML(x.name)}: còn ${Number(x.qty)||0} ${escapeHTML(x.unit)}</p>`).join(""):'<div class="empty">Chưa có nguyên liệu cần cảnh báo</div>';
  $("historyList").innerHTML=historyRows.length?historyRows.map(x=>`<div class="logrow"><b>${escapeHTML(x.name)}</b><div>${x.type==="in"?"<span style='color:#15945b'>＋ Nhập kho</span>":"<span style='color:#d94343'>－ Xuất kho</span>"} · ${Number(x.qty)||0} ${escapeHTML(x.unit)}</div><small>Người thực hiện: ${escapeHTML(x.actorName||x.actorUid||"Không rõ")} · ${roleName[x.actorRole]||escapeHTML(x.actorRole||"")}<br>Tồn trước: ${Number(x.beforeQty)||0} → Tồn sau: ${Number(x.afterQty)||0}<br>${dateText(x.createdAt)}${x.note?" · "+escapeHTML(x.note):""}</small></div>`).join(""):'<div class="empty">Chưa có lịch sử nhập xuất</div>';
@@ -315,6 +317,7 @@ function render(){
 function renderAccess(){
  $("accessList").innerHTML=accessRows.length?accessRows.map(x=>`<div class="logrow"><b>${escapeHTML(x.name||x.email||"Người dùng")}</b> <span class="pill">${escapeHTML(roleName[x.role]||x.role||"")}</span><small>${escapeHTML(x.email||"")}<br>Đăng nhập: ${dateText(x.loginAt)}<br>Hoạt động cuối: ${dateText(x.lastActivityAt)}<br>Trạng thái: ${escapeHTML(x.status||"active")}${x.logoutAt?" · Đăng xuất: "+dateText(x.logoutAt):""}</small></div>`).join(""):'<div class="empty">Chưa có nhật ký truy cập</div>';
 }
+window.render = render;
 render();
 </script>
 </body>
