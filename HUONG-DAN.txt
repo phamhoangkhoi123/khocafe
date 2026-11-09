@@ -1,0 +1,20 @@
+QUẢN LÝ KHO - GÓI PWA
+
+CÁCH ĐƯA LÊN GITHUB PAGES
+1. Mở repository GitHub đang chứa website /khocafe/.
+2. Thay file index.html cũ bằng index.html trong gói này.
+3. Tải lên manifest.json và sw.js ở cùng cấp với index.html.
+4. Tải nguyên thư mục icons (giữ đúng tên và cấu trúc).
+5. Commit changes và chờ GitHub Pages cập nhật.
+
+CÀI TRÊN ANDROID
+Mở https://phamhoangkhoi123.github.io/khocafe/ bằng Chrome, chọn Cài đặt ứng dụng hoặc Thêm vào màn hình chính.
+
+CÀI TRÊN IPHONE
+Mở website bằng Safari > nút Chia sẻ > Thêm vào Màn hình chính.
+
+LƯU Ý
+- Đây là PWA cơ bản: app shell có thể mở từ cache khi mạng yếu, nhưng đăng nhập và dữ liệu Firebase vẫn cần Internet.
+- Service Worker chỉ cache trang vỏ; không cache dữ liệu riêng tư, Firebase SDK hay dữ liệu kho.
+- Trước khi thay file trên GitHub, nên tải bản index.html hiện tại về làm bản sao lưu.
+- Gói này chưa triển khai mô hình nhiều cửa hàng (shopId); đó là một đợt nâng cấp bảo mật/dữ liệu riêng biệt.

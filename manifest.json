@@ -1,0 +1,17 @@
+{
+  "id": "/khocafe/",
+  "name": "Quản Lý Kho",
+  "short_name": "Quản Lý Kho",
+  "description": "Ứng dụng quản lý nguyên liệu và kho hàng",
+  "start_url": "/khocafe/",
+  "scope": "/khocafe/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#f3f5fa",
+  "theme_color": "#5865e8",
+  "icons": [
+    { "src": "/khocafe/icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/khocafe/icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "/khocafe/icons/icon-512-maskable.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
